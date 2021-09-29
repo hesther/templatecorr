@@ -5,7 +5,10 @@ A Python package to hierarchically correct a list of reaction templates.
 """
 
 # Add imports here
-from .templatecorr import *
+from .extract_templates import *
+from .correct_templates import *
+from .helpers import *
+from .canonize_templates import *
 
 # Handle versioneer
 from ._version import get_versions

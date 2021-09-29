@@ -3,18 +3,22 @@ channels:
 
   - conda-forge
 
-  - defaults
-dependencies:
+  - defaults dependencies:
     # Base depends
   - python
   - pip
 
+    # Package dependencies
+    - numpy
+    - rdkit
+    - pandas
+    
     # Testing
-  - pytest
-  - pytest-cov
-  - codecov
+    - pytest
+    - pytest-cov
+    - codecov
 
     # Pip-only installs
-  #- pip:
-  #  - codecov
+    #- pip:
+    #  - codecov
 

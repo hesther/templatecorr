@@ -1,0 +1,13 @@
+name: templatecorr
+
+channels:
+  - conda-forge
+  - rdkit
+
+dependencies:
+  - python>=3.6
+  - numpy
+  - pip
+  - rdkit
+  - pandas
+
