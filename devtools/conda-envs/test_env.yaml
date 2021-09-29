@@ -9,16 +9,16 @@ channels:
   - pip
 
     # Package dependencies
-    - numpy
-    - rdkit
-    - pandas
+  - numpy
+  - rdkit
+  - pandas
     
-    # Testing
-    - pytest
-    - pytest-cov
-    - codecov
+  # Testing
+  - pytest
+  - pytest-cov
+  - codecov
 
-    # Pip-only installs
-    #- pip:
-    #  - codecov
+  # Pip-only installs
+  #- pip:
+  #  - codecov
 
