@@ -23,5 +23,5 @@ except ImportError:
 
     def canonicalize_template(template, brackets=True):
         """Mock implementation if canonicalize_transform cannot be imported."""
-        print("WARNING: Canonicalization code could not be loaded. Make sure to use the rdchiral C++ version (conda install -c conda-forge -c ljn917 rdchiral_cpp), only available for Unix, currently. Returning the non-canonicalized templates")
+        print("WARNING: Canonicalization code could not be loaded. Make sure to use the rdchiral C++ version (conda install -c conda-forge rdchiral_cpp). Returning the non-canonicalized templates")
         return template

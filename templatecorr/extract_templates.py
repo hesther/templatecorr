@@ -19,7 +19,7 @@ def canonicalize_mol(rxn_smi,split):
     smi = Chem.MolToSmiles(Chem.MolFromSmiles(smi), True)
     return smi
 
-def get_templates(rxn_smi, prec, no_special_groups, radius):
+def get_templates(rxn_smi, prec, no_special_groups, radius, add_brackets=True):
     """
     Extracts a template at a specified level of specificity for a reaction smiles.
 
@@ -27,6 +27,7 @@ def get_templates(rxn_smi, prec, no_special_groups, radius):
     :param prec: Canonical smiles string of precursor
     :param no_special_groups: Boolean whether to omit special groups in template extraction
     :param radius: Integer at which radius to extract templates
+    :param add_brackets: Whether to add brackets to make template pseudo-unimolecular
 
     :return: Template
     """    
@@ -35,7 +36,8 @@ def get_templates(rxn_smi, prec, no_special_groups, radius):
         rxn_split = rxn_smi.split(">")
         reaction={"_id":0,"reactants":rxn_split[0],"spectator":rxn_split[1],"products":rxn_split[2]}
         template = extract_from_reaction(reaction,no_special_groups=no_special_groups,radius=radius)["reaction_smarts"]
-        template = "(" + template.replace(">>", ")>>")
+        if add_brackets:
+            template = "(" + template.replace(">>", ")>>")
     except:
         template = None  
     #Validate:
@@ -49,6 +51,25 @@ def get_templates(rxn_smi, prec, no_special_groups, radius):
         if not prec in outcomes:
             template=None
     return template
+
+def get_templates_temprel(reaction, no_special_groups, radius):
+    """
+    Extracts a template at a specified level of specificity for a reaction smiles.
+
+    :param rxn_smi: Reaction smiles string
+    :param no_special_groups: Boolean whether to omit special groups in template extraction
+    :param radius: Integer at which radius to extract templates
+
+    :return: Template
+    """    
+    try:
+        return extract_from_reaction(reaction,no_special_groups=no_special_groups,radius=radius)
+    except Exception as e:
+        return {
+            'reaction_id': reaction['_id'],
+            'error': str(e)
+        }
+
 
 def switch_direction(template, brackets=True):
     """Computes reversed templates.

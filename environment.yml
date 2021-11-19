@@ -10,4 +10,6 @@ dependencies:
   - pip
   - rdkit
   - pandas
+  - rdchiral_cpp
+  - joblib
 
