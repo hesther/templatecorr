@@ -17,7 +17,9 @@ dependencies:
   - numpy
   - rdkit
   - pandas
+  - joblib
 
   # Pip-only installs
   - pip:
-    - rdchiral
+    - git+https://github.com/hesther/rdchiral.git
+    - git+https://gitlab.com/mefortunato/template-relevance.git

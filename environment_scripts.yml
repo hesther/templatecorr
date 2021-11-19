@@ -1,4 +1,4 @@
-name: templatecorr
+name: templatecorr_nocan
 
 channels:
   - conda-forge
@@ -13,4 +13,6 @@ dependencies:
   - tensorflow=2.0
   - joblib
   - scikit-learn
+  - pip:
+     - git+https://github.com/hesther/rdchiral.git
 
