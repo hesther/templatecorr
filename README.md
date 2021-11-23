@@ -65,6 +65,10 @@ pip install -e .
 
 Extract the archived file `data.tar.gz` if you have not already done so, go to the `scripts` folder  and run the scripts in consecutive order (from 01 to 05). To reproduce the exact results from the manuscript, run script 01, 03, 04 and 05 with the templatecorr_nocan environment, and script 02 with the templatecorr environment. Since the canonicalization functionality is now per default used in the C++ rdchiral package, non-canonical templates can otherwise not be obtained easily.
 
+### AiZynthFinder models
+
+AiZynthFinder template and policy model files are available in the folder `aizynthfinder_models` for the canonical-corrected template sets of this study (USPTO-50k and USPTO-460k).
+
 ### Contact
 
 For questions, feedback, concerns or wishes, contact Esther at eheid@mit.edu.
