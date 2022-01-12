@@ -9,7 +9,6 @@ from .extract_templates import *
 from .correct_templates import *
 from .helpers import *
 from .canonize_templates import *
-from .temprel_drop_in import *
 
 # Handle versioneer
 from ._version import get_versions

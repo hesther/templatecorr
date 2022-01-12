@@ -73,6 +73,8 @@ def get_rank_precursor_multi(prob_list,smi,prec_goal,templates,n_cpus):
         num_prev_prec += len(outcomes)-num_duplicates
         known_prec.update(outcomes)
 
+    for r,idx in enumerate(sorted_idx[:100]):
+        outcomes=outcomes_all[r]
         if len(outcomes)!=0:
             applicable.append(1)
         else:
