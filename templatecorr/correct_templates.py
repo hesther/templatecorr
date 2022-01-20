@@ -1,6 +1,8 @@
 import rdkit.Chem as Chem
 import pandas as pd
+import tqdm
 from joblib import Parallel, delayed
+from multiprocessing import Pool, TimeoutError
 from .extract_templates import canonicalize_mol, get_templates, get_templates_temprel
 from rdkit import RDLogger
 RDLogger.DisableLog('rdApp.*')
@@ -154,6 +156,28 @@ def correct_loop(df,column_name2, template):
     templates=correct_templates(df[column_name2])
     return df.index, templates
 
+def parallel_extract(df, nol, r, reaction_column, add_brackets=False, nproc = 20, timeout=3):
+    pool = Pool(processes=nproc)
+    async_results = [pool.apply_async(get_templates, (data[reaction_column][idx], data["canonical_reac_smiles"][idx], nol, r, add_brackets)) for idx in df.index]
+    templates = []
+    for res in tqdm.tqdm(async_results):
+        try:
+            templates.append(res.get(timeout))
+        except TimeoutError:
+            templates.append(None)
+    return templates
+
+def parallel_extract_temprel(df, nol, r, nproc = 20, timeout=3):
+    pool = Pool(processes=nproc)
+    async_results = [pool.apply_async(get_templates_temprel, (reaction, nol, r)) for reaction in df.to_dict(orient='records')]
+    templates = []
+    for res in tqdm.tqdm(async_results):
+        try:
+            templates.append(res.get(timeout))
+        except TimeoutError:
+            templates.append({'dimer_only':None, 'intra_only':None, 'necessary_reagent':None, 'reaction_id':None, 'reaction_smarts':None})
+    return templates
+
 def templates_from_file(path, reaction_column = "rxn_smiles", name="template", nproc=20, drop_extra_cols = True, data_format='csv', save=True):
     print("Reading file...")
     if data_format in ['json', 'json.gz']:
@@ -171,11 +195,13 @@ def templates_from_file(path, reaction_column = "rxn_smiles", name="template", n
     data["canonical_reac_smiles"] = Parallel(n_jobs=nproc, verbose=1)(delayed(canonicalize_mol)(rxn_smi,0) for rxn_smi in data[reaction_column])
 
     print("Extracting templates (Radius 1 with special groups)...")
-    data[name] = Parallel(n_jobs=nproc, verbose=1)(delayed(get_templates)(data[reaction_column][idx], data["canonical_reac_smiles"][idx], False, 1, add_brackets=False) for idx in data.index)
+    data[name] = parallel_extract(data, False, 1, reaction_column, nproc=nproc)
+
     print("Extracting templates (Radius 1 without special groups)...")
-    data[name+"_r1"] = Parallel(n_jobs=nproc, verbose=1)(delayed(get_templates)(data[reaction_column][idx], data["canonical_reac_smiles"][idx], True, 1, add_brackets=False) for idx in data.index)
+    data[name+"_r1"] = parallel_extract(data, True, 1, reaction_column, nproc=nproc)
+
     print("Extracting templates (Radius 0 without special groups)...")
-    data[name+"_r0"] = Parallel(n_jobs=nproc, verbose=1)(delayed(get_templates)(data[reaction_column][idx], data["canonical_reac_smiles"][idx], True, 0, add_brackets=False) for idx in data.index)
+    data[name+"_r0"] = parallel_extract(data, True, 0, reaction_column, nproc=nproc)
 
     data = data.dropna(subset=[name,name+"_r0",name+"_r1"])
 
@@ -205,17 +231,17 @@ def templates_from_df(df, nproc = 20, reaction_column = "reaction_smiles", name=
     data=df.copy()
     
     print("Extracting templates (Radius 1 with special groups)...")
-    templates = Parallel(n_jobs=nproc, verbose=1)(delayed(get_templates_temprel)(reaction, False, 1) for reaction in df.to_dict(orient='records'))
+    templates = parallel_extract_temprel(df, False, 1, nproc)
     templates = pd.DataFrame(filter(lambda x: x, templates))
     data[['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']] = templates[['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']].values
     
     print("Extracting templates (Radius 1 without special groups)...")
-    templates = Parallel(n_jobs=nproc, verbose=1)(delayed(get_templates_temprel)(reaction, True, 1) for reaction in df.to_dict(orient='records'))
+    templates = parallel_extract_temprel(df, True, 1, nproc) 
     templates = pd.DataFrame(filter(lambda x: x, templates))
     data[name+"_r1"] = templates['reaction_smarts'].values                         
     
     print("Extracting templates (Radius 0 without special groups)...")
-    templates = Parallel(n_jobs=nproc, verbose=1)(delayed(get_templates_temprel)(reaction, True, 0) for reaction in df.to_dict(orient='records'))
+    templates = parallel_extract_temprel(df, True, 0, nproc)
     templates = pd.DataFrame(filter(lambda x: x, templates))
     data[name+"_r0"] = templates['reaction_smarts'].values
     
