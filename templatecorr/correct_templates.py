@@ -158,7 +158,7 @@ def correct_loop(df,column_name2, template):
 
 def parallel_extract(df, nol, r, reaction_column, add_brackets=False, nproc = 20, timeout=3):
     pool = Pool(processes=nproc)
-    async_results = [pool.apply_async(get_templates, (data[reaction_column][idx], data["canonical_reac_smiles"][idx], nol, r, add_brackets)) for idx in df.index]
+    async_results = [pool.apply_async(get_templates, (df[reaction_column][idx], df["canonical_reac_smiles"][idx], nol, r, add_brackets)) for idx in df.index]
     templates = []
     for res in tqdm.tqdm(async_results):
         try:
