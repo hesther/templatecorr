@@ -18,6 +18,7 @@ dependencies:
   - rdkit
   - pandas
   - joblib
+  - tqdm
 
   # Pip-only installs
   - pip:

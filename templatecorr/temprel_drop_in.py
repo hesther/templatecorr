@@ -3,6 +3,8 @@ import re
 import pandas as pd
 import hashlib
 from joblib import Parallel, delayed
+from multiprocessing import Pool, TimeoutError
+import tqdm
 from temprel.templates.validate import validate_template
 from .correct_templates import templates_from_df
 from rdkit import RDLogger
@@ -16,6 +18,17 @@ def unmap(smarts):
 
 def count_products(smiles):
     return 1 + smiles.count('.')
+
+def parallel_validate(df, nproc, timeout=3):
+    pool = Pool(processes=nproc)
+    async_results = [pool.apply_async(validate_template, (r,)) for r in df.to_dict(orient='records')]
+    valid = []
+    for res in tqdm.tqdm(async_results):
+        try:
+            valid.append(res.get(timeout))
+        except TimeoutError:
+            valid.append(False)
+    return valid
 
 try:
     from temprel.templates.filter import filter_by_bond_edits
@@ -52,9 +65,7 @@ try:
         keep_cols = ['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']
         df = df.merge(templates[keep_cols], left_on='_id', right_on='reaction_id')
         df = df.dropna(subset=['reaction_smarts'])
-        valid = Parallel(n_jobs=nproc, verbose=1)(
-            delayed(validate_template)(template) for template in df.to_dict(orient='records')
-        )
+        valid = parallel_validate(df, nproc, timeout)
         df = df[valid]
 
         df = filter_fn(df, nproc=nproc, **filter_kwargs)
@@ -107,9 +118,7 @@ except ImportError:
         keep_cols = ['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']
         df = df.merge(templates[keep_cols], left_on='_id', right_on='reaction_id')
         df = df.dropna(subset=['reaction_smarts'])
-        valid = Parallel(n_jobs=nproc, verbose=1)(
-            delayed(validate_template)(template) for template in df.to_dict(orient='records')
-        )
+        valid = parallel_validate(df, nproc, timeout)
         df = df[valid]
 
         df['unmapped_template'] = df['reaction_smarts'].apply(unmap)
