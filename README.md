@@ -5,7 +5,7 @@ templatecorr
 
 
 A Python package to hierarchically correct a list of reaction templates.
-See our publication [On the influence of template size, canonicalization and exclusivity for retrosynthesis and reaction prediction applications](https://doi.org/10.33774/chemrxiv-2021-9s7gj) for further information and benchmarks.
+See our publication [On the influence of template size, canonicalization and exclusivity for retrosynthesis and reaction prediction applications](https://doi.org/10.1021/acs.jcim.1c01192) for further information and benchmarks.
 
 ### Installation
 
@@ -54,7 +54,7 @@ If you want to use the template correction code together with the [template-rele
 
 ### Reproduce our study
 
-If you want to reproduce the results of the publication [On the influence of template size, canonicalization and exclusivity for retrosynthesis and reaction prediction applications](https://doi.org/10.33774/chemrxiv-2021-9s7gj), you need to create another conda environment (since the newest rdchiral version (C++) used above automatically canonicalizes templates). We will use both environments in the following.
+If you want to reproduce the results of the publication [On the influence of template size, canonicalization and exclusivity for retrosynthesis and reaction prediction applications](https://doi.org/10.1021/acs.jcim.1c01192), you need to create another conda environment (since the newest rdchiral version (C++) used above automatically canonicalizes templates). We will use both environments in the following.
 
 ```
 conda deactivate
