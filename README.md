@@ -42,10 +42,10 @@ python correct.py --path data/uspto_50k
 where `--path` specifies the path to the reaction file without file ending. This will create the file data/uspto_50k_corrected.csv, which now contains an additional column `template`, holding the extracted, canonicalized and corrected template. The above command is the same as
 
 ```
-python correct.py --path data/uspto_50k --reaction_column rxn_smiles --name template --nproc 20 --drop_extra_cols --data_format csv
+python correct.py --path data/uspto_50k --reaction_column rxn_smiles --name template --nproc 20 --data_format csv
 ```
 
-where `--reaction_column rxn_smiles` specifies the name of the column containing reaction SMILES, `--name template` sets the name of the column for the extracted templates in the output file (here to "template"), `--nproc 20` parallelizes the program over 20 processes, `--drop_extra_cols` causes additional helper columns during extraction (canonical reactant SMILES, templates at radius 0 and 1) to be dropped before saving the dataframe to file, and `--data_format csv` specifies the input format of the data, as well as the output format.
+where `--reaction_column rxn_smiles` specifies the name of the column containing reaction SMILES, `--name template` sets the name of the column for the extracted templates in the output file (here to "template"), `--nproc 20` parallelizes the program over 20 processes, and `--data_format csv` specifies the input format of the data, as well as the output format. Per default, additional helper columns during extraction (canonical reactant SMILES, templates at radius 0 and 1) are dropped before saving the dataframe to file. To prevent this, use the flag  `--keep_extra_cols`. 
 
 ### Use to retrain a template relevance model
 
@@ -71,7 +71,7 @@ AiZynthFinder template and policy model files are available in the folder `aizyn
 
 ### Contact
 
-For questions, feedback, concerns or wishes, contact Esther at eheid@mit.edu.
+For questions, feedback, concerns or wishes, contact Esther at eheid@mit.edu or raise an Issue on Github.
 
 ### Copyright
 
