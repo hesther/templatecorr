@@ -216,9 +216,9 @@ def templates_from_file(path, reaction_column = "rxn_smiles", name="template", n
         if data_format == 'csv':
             data.to_csv(path+"_corrected."+data_format, index=False)
         elif data_format == 'json':
-            data.to_json(path+"_corrected."+data_format, orient='record')
+            data.to_json(path+"_corrected."+data_format, orient='records')
         elif data_format == 'json.gz':
-            data.to_json(path+"_corrected."+data_format, orient='record', compression='gzip')
+            data.to_json(path+"_corrected."+data_format, orient='records', compression='gzip')
         elif data_format in ['pkl', 'pickle']:
             data.to_pickle(path+"_corrected."+data_format)
         elif data_format == 'hdf5':
