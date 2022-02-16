@@ -205,13 +205,18 @@ def templates_from_file(path, reaction_column = "rxn_smiles", name="template", n
 
     data = data.dropna(subset=[name,name+"_r0",name+"_r1"])
 
+    data[name+'_uncorrected']=data[name]
+
     print("Hierarchically correcting templates...")
     data[name+"_r1"] = correct_all_templates(data,name+"_r0",name+"_r1", nproc)
     data[name] = correct_all_templates(data,name+"_r1",name, nproc)
 
     if drop_extra_cols:
-        data = data.drop(columns=["canonical_reac_smiles", name+"_r0",name+"_r1"])
+        data = data.drop(columns=["canonical_reac_smiles", name+"_r0",name+"_r1",name+"_uncorrected"])
 
+    if "new_t" in data.keys():
+        data = data.drop(columns=["new_t"])
+    
     if save:
         if data_format == 'csv':
             data.to_csv(path+"_corrected."+data_format, index=False)
