@@ -34,7 +34,7 @@ try:
     from temprel.templates.filter import filter_by_bond_edits
     from temprel.rdkit import fix_spectators
     
-    def templates_from_reactions(df, output_prefix=None, nproc=8, timeout=3, filter_fn=filter_by_bond_edits, filter_kwargs={}):
+    def templates_from_reactions(df, output_prefix=None, nproc=8, timeout=3, filter_fn=filter_by_bond_edits, filter_kwargs={}, radius=1, no_special_groups=False):
         """Version with filter (proprietary gitlab version)"""
     
         assert output_prefix is not None, 'Please specify a directory for the output files'
@@ -61,7 +61,7 @@ try:
             df['_id'] = df.apply(create_hash, axis=1)
         num_products = df['products'].apply(count_products)
         df = df[num_products==1]
-        templates = templates_from_df(df, nproc)
+        templates = templates_from_df(df, nproc, radius=radius, no_special_groups=no_special_groups)
         keep_cols = ['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']
         df = df.merge(templates[keep_cols], left_on='_id', right_on='reaction_id')
         df = df.dropna(subset=['reaction_smarts'])
@@ -87,7 +87,7 @@ except ImportError:
     
     from temprel.rdkit import remove_spectating_reactants
     
-    def templates_from_reactions(df, output_prefix=None, nproc=8, timeout=3):
+    def templates_from_reactions(df, output_prefix=None, nproc=8, timeout=3, radius=1, no_special_groups=False):
         """Version without filter (open-source gitlab version)"""
     
         assert output_prefix is not None, 'Please specify a directory for the output files'
@@ -114,7 +114,7 @@ except ImportError:
             df['_id'] = df.apply(create_hash, axis=1)
         num_products = df['products'].apply(count_products)
         df = df[num_products==1]
-        templates = templates_from_df(df, nproc)
+        templates = templates_from_df(df, nproc, radius=radius, no_special_groups=no_special_groups)
         keep_cols = ['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']
         df = df.merge(templates[keep_cols], left_on='_id', right_on='reaction_id')
         df = df.dropna(subset=['reaction_smarts'])

@@ -49,7 +49,7 @@ where `--reaction_column rxn_smiles` specifies the name of the column containing
 
 ### Use to retrain a template relevance model
 
-If you want to use the template correction code together with the [template-relevance](https://gitlab.com/mefortunato/template-relevance) GitLab repository, there is a simple drop-in replacement: In your workflow, instead of using bin/process.py from the template-relevance repository, use temprel_scripts/process.py (same usage, same arguments).
+If you want to use the template correction code together with the [template-relevance](https://gitlab.com/mefortunato/template-relevance) GitLab repository, there is a simple drop-in replacement: In your workflow, instead of using bin/process.py from the template-relevance repository, use temprel_scripts/process.py (same usage, same arguments). NEW: Optional additional parameters to specify the radius and presence of special groups (default `--radius 1` with special groups. To not use special groups in the templates, use `--no_special_groups`).
 
 
 ### Reproduce our study

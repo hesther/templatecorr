@@ -11,6 +11,8 @@ def parse_arguments():
     parser.add_argument('--output-prefix', dest='output_prefix', default='data/processed/')
     parser.add_argument('--calc-split', dest='calc_split', default='stratified')
     parser.add_argument('--template-set-name', dest='template_set_name', default='uspto_50k')
+    parser.add_argument('--radius', dest='radius', type=int,default=1)
+    parser.add_argument('--no_special_groups', dest='no_special_groups', type=bool, default=False)
     return parser.parse_args()
 
 def print_time(task_name, t0):
@@ -24,7 +26,7 @@ if __name__ == '__main__':
     t0 = time.time()
     reactions = pd.read_json(args.reactions)
     t0 = print_time('read', t0)
-    templates = templates_from_reactions(reactions, output_prefix=args.output_prefix, nproc=args.nproc)
+    templates = templates_from_reactions(reactions, output_prefix=args.output_prefix, nproc=args.nproc, radius=args.radius, no_special_groups=args.no_special_groups)
     t0 = print_time('extract', t0)
     process_for_training(templates, output_prefix=args.output_prefix, calc_split=args.calc_split)
     t0 = print_time('featurize', t0)

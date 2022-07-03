@@ -227,28 +227,41 @@ def templates_from_file(path, reaction_column = "rxn_smiles", name="template", n
             
     return data
 
-def templates_from_df(df, nproc = 20, reaction_column = "reaction_smiles", name="reaction_smarts"):
+def templates_from_df(df, nproc = 20, reaction_column = "reaction_smiles", name="reaction_smarts", radius=1, no_special_groups=False):
     data=df.copy()
-    
-    print("Extracting templates (Radius 1 with special groups)...")
-    templates = parallel_extract_temprel(df, False, 1, nproc)
-    templates = pd.DataFrame(filter(lambda x: x, templates))
-    data[['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']] = templates[['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']].values
-    
-    print("Extracting templates (Radius 1 without special groups)...")
-    templates = parallel_extract_temprel(df, True, 1, nproc) 
-    templates = pd.DataFrame(filter(lambda x: x, templates))
-    data[name+"_r1"] = templates['reaction_smarts'].values                         
-    
-    print("Extracting templates (Radius 0 without special groups)...")
-    templates = parallel_extract_temprel(df, True, 0, nproc)
-    templates = pd.DataFrame(filter(lambda x: x, templates))
-    data[name+"_r0"] = templates['reaction_smarts'].values
-    
-    not_na_mask = data[name].notna() & data[name+"_r0"].notna() & data[name+"_r1"].notna()
+
+    column_names = [name]
+    for r in range(radius+1):
+        print("Extracting templates (Radius", r, "without special groups)...")
+        templates = parallel_extract_temprel(df, True, r, nproc)
+        templates = pd.DataFrame(filter(lambda x: x, templates))
+        if r==radius and no_special_groups:
+            data[['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']] = templates[['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']].values
+        else:
+            data[name+"_r"+str(r)] = templates['reaction_smarts'].values
+            column_names.append(name+"_r"+str(r))
+
+    if not no_special_groups:
+        print("Extracting templates (Radius", radius, "with special groups)...")
+        templates = parallel_extract_temprel(df, False, radius, nproc)
+        templates = pd.DataFrame(filter(lambda x: x, templates))
+        data[['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']] = templates[['dimer_only', 'intra_only', 'necessary_reagent', 'reaction_id', 'reaction_smarts']].values
+
+    not_na_mask = data[column_names].notna().all(1)
 
     print("Hierarchically correcting templates...")
-    data.loc[not_na_mask,name+"_r1"] = correct_all_templates(data[not_na_mask],name+"_r0",name+"_r1", nproc)
-    data.loc[not_na_mask,name] = correct_all_templates(data[not_na_mask],name+"_r1",name, nproc)
+    for r in range(radius+1):
+        if r < radius and r-1>=0:
+            print("... correcting",name+"_r"+str(r),"via",name+"_r"+str(r-1))
+            data.loc[not_na_mask,name+"_r"+str(r)] = correct_all_templates(data[not_na_mask],name+"_r"+str(r-1),name+"_r"+str(r), nproc)
+        elif r==radius and not no_special_groups:
+            if r-1>=0:
+                print("... correcting",name+"_r"+str(r),"via",name+"_r"+str(r-1))
+                data.loc[not_na_mask,name+"_r"+str(r)] = correct_all_templates(data[not_na_mask],name+"_r"+str(r-1),name+"_r"+str(r), nproc)
+            print("... correcting",name,"via",name+"_r"+str(r))
+            data.loc[not_na_mask,name] = correct_all_templates(data[not_na_mask],name+"_r"+str(r),name, nproc)
+        elif r==radius and no_special_groups and r-1>=0:
+            print("... correcting",name,"via",name+"_r"+str(r-1))
+            data.loc[not_na_mask,name] = correct_all_templates(data[not_na_mask],name+"_r"+str(r-1),name, nproc)
 
     return data
