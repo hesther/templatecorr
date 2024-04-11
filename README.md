@@ -71,7 +71,7 @@ AiZynthFinder template and policy model files are available in the folder `aizyn
 
 ### Contact
 
-For questions, feedback, concerns or wishes, contact Esther at eheid@mit.edu.
+For questions, feedback, concerns or wishes, contact Esther at esther.heid@tuwien.ac.at.
 
 ### Copyright
 
