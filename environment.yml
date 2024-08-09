@@ -10,7 +10,7 @@ dependencies:
   - pip
   - rdkit
   - pandas
-  - rdchiral_cpp
+  - rdchiral_cpp==1.1.2
   - joblib
   - tqdm
 
