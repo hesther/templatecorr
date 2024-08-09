@@ -38,6 +38,9 @@ def get_templates(rxn_smi, prec, no_special_groups, radius, add_brackets=True):
         template = extract_from_reaction(reaction,no_special_groups=no_special_groups,radius=radius)["reaction_smarts"]
         if add_brackets:
             template = "(" + template.replace(">>", ")>>")
+    except TypeError as e:
+        print("An Exception was thrown. This likely originates from a wrong rdchiral installation, try installing rdchiral_cpp==1.1.2")
+        raise e
     except:
         template = None  
     #Validate:
