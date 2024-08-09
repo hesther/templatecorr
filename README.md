@@ -47,6 +47,21 @@ python correct.py --path data/uspto_50k --reaction_column rxn_smiles --name temp
 
 where `--reaction_column rxn_smiles` specifies the name of the column containing reaction SMILES, `--name template` sets the name of the column for the extracted templates in the output file (here to "template"), `--nproc 20` parallelizes the program over 20 processes, `--drop_extra_cols` causes additional helper columns during extraction (canonical reactant SMILES, templates at radius 0 and 1) to be dropped before saving the dataframe to file, and `--data_format csv` specifies the input format of the data, as well as the output format.
 
+### Extract and correct templates with Docker
+
+If facing issues with dependencies or incompatibilities of architecture with packages (e.g. rdchiral_cpp installation can pose issues on mac M1), you can run correct.py in a docker container, using the following steps:
+1. Build docker image from Dockerfile:
+```
+docker build -t templatecorr .
+```
+2. Run container using docker compose:
+```
+docker compose up
+```
+
+docker-compose.yaml contains default setup for running correct.py script on test data. If you want to insert your own data, simply change the path argument in command. Note that container volume is mounted to output result csv to /data folder, just like the original script.
+
+
 ### Use to retrain a template relevance model
 
 If you want to use the template correction code together with the [template-relevance](https://gitlab.com/mefortunato/template-relevance) GitLab repository, there is a simple drop-in replacement: In your workflow, instead of using bin/process.py from the template-relevance repository, use temprel_scripts/process.py (same usage, same arguments). NEW: Optional additional parameters to specify the radius and presence of special groups (default `--radius 1` with special groups. To not use special groups in the templates, use `--no_special_groups`).

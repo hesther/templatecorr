@@ -1,0 +1,7 @@
+services:
+  correct-templates:
+    image: templatecorr:latest
+    command: [
+      "python", "correct.py", "--path", "data/uspto_50k"]
+    volumes:
+     - ./data:/app/data
